@@ -1,7 +1,6 @@
 namespace Domain
 {
     using System.ComponentModel.DataAnnotations;
-
     using System;
     
     public class Exertion
