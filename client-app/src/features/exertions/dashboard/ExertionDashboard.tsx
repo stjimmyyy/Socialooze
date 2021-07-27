@@ -15,17 +15,20 @@ interface Props {
     closeForm: () => void;
     createOrEdit: (exertion: Exertion) => void;
     deleteExertion: (id: string) => void;
+    submitting: boolean
 }
 
 export default function ExertionDashboard({exertions, 
        selectedExertion, selectExertion, cancelSelectExertion,
-        editMode, openForm, closeForm, createOrEdit, deleteExertion}: Props){
+        editMode, openForm, closeForm, createOrEdit, deleteExertion, submitting}: Props){
     return(
         <Grid>
             <Grid.Column width='10'>
                 <ExertionList exertions={exertions} 
                               selectExertion={selectExertion}
-                              deleteExertion={deleteExertion}/>
+                              deleteExertion={deleteExertion}
+                              submitting={submitting}
+                />
             </Grid.Column>
             <Grid.Column width='6'>
                 {selectedExertion && !editMode &&
@@ -33,7 +36,12 @@ export default function ExertionDashboard({exertions,
                                  cancelSelectExertion={cancelSelectExertion}
                                  openForm={openForm}/>}
                 {editMode &&
-                <ExertionForm closeForm={closeForm} exertion={selectedExertion} createOrEdit={createOrEdit}/>}
+                <ExertionForm 
+                    closeForm={closeForm} 
+                    exertion={selectedExertion} 
+                    createOrEdit={createOrEdit}
+                    submitting={submitting}
+                />}
             </Grid.Column>
         </Grid>
     )

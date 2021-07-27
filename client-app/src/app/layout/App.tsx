@@ -1,21 +1,29 @@
 import React, {useEffect, useState} from 'react';
-import axios from 'axios';
 import {Container} from "semantic-ui-react";
 import {Exertion} from "../models/exertion";
 import NavBar from "./NavBar";
 import ExertionDashboard from '../../features/exertions/dashboard/ExertionDashboard';
 import {v4 as uuid} from 'uuid';
+import agent from '../api/agent';
+import LoadingComponent from "./LoadingComponent";
 
 function App() {
   const [exertions, setExertions] = useState<Exertion[]>([]);
   const [selectedExertion, setSelectedExertion] = useState<Exertion | undefined>(undefined);
   const [editMode, setEditMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false)
   
   useEffect(() => {
-    axios.get('http://localhost:5000/api/exertions')
+    agent.Exertions.list()
         .then(response => {
-          console.log(response);
-          setExertions(response.data);
+          let exertions: Exertion[] = [];
+          response.forEach(exertion => {
+              exertion.date = exertion.date.split('T')[0];
+              exertions.push(exertion);
+          })
+          setExertions(response);
+          setLoading(false);
         })
   }, [])
   
@@ -37,17 +45,40 @@ function App() {
   }
   
   function handleCreateOrEditExertion(exertion: Exertion){
-      exertion.id ? setExertions([...exertions
-          .filter(x => x.id !== exertion.id), exertion])
-          : setExertions([...exertions, {...exertion, id: uuid()}]);
       
-      setEditMode(false);
-      setSelectedExertion(exertion);
+      setSubmitting(true);
+      
+      if(exertion.id){
+          agent.Exertions.update(exertion)
+              .then(() => {
+                  setExertions([...exertions
+                      .filter(x => x.id !== exertion.id), exertion]);
+                  setSelectedExertion(exertion);
+                  setEditMode(false);
+                  setSubmitting(false);
+              })
+      } else {
+          exertion.id = uuid();
+          agent.Exertions.create(exertion)
+              .then(() => {
+                  setExertions([...exertions, exertion]);
+                  setSelectedExertion(exertion);
+                  setEditMode(false);
+                  setSubmitting(false);
+              })
+      }
   }
   
   function handleDeleteExertion(id: string){
-      setExertions([...exertions.filter(x => x.id !== id)]);
+      setSubmitting(true);
+      agent.Exertions.delete(id)
+          .then(() => {
+              setExertions([...exertions.filter(x => x.id !== id)]);  
+              setSubmitting(false);
+          })
   }
+  
+  if(loading) return <LoadingComponent content='Loading app...' />
   
   return (
     <>
@@ -63,6 +94,7 @@ function App() {
                 closeForm={handleFormClose}
                 createOrEdit={handleCreateOrEditExertion}
                 deleteExertion={handleDeleteExertion}
+                submitting={submitting}
             />
         </Container>
     </>

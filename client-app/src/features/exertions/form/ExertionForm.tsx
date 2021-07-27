@@ -6,9 +6,10 @@ interface Props {
     exertion: Exertion | undefined;
     closeForm: () => void;
     createOrEdit: (exertion: Exertion) => void;
+    submitting: boolean
 }
 
-export default function ExertionForm({exertion: selectedExertion, closeForm, createOrEdit}: Props){
+export default function ExertionForm({exertion: selectedExertion, closeForm, createOrEdit, submitting}: Props){
     
     const initialState = selectedExertion ?? {
         id: '',
@@ -47,6 +48,7 @@ export default function ExertionForm({exertion: selectedExertion, closeForm, cre
                             onChange={handleInputChange}/>
                 
                 <Form.Input placeholder='Date' value={exertion.date}
+                            type='date'
                             name='date'
                             onChange={handleInputChange}/>
                 
@@ -58,7 +60,7 @@ export default function ExertionForm({exertion: selectedExertion, closeForm, cre
                             name='venue'
                             onChange={handleInputChange}/>
                 
-                <Button floated='right' positive type='submit' content='Submit'/>
+                <Button loading={submitting} floated='right' positive type='submit' content='Submit'/>
                 <Button onClick={closeForm} floated='right' type='button' content='Cancel'/>
             </Form>
         </Segment>

@@ -1,14 +1,24 @@
-import React from "react";
+import React, {SyntheticEvent} from "react";
 import {Exertion} from "../../../app/models/exertion";
 import {Button, Item, Label, Segment} from "semantic-ui-react";
+import { useState } from "react";
 
 interface Props {
     exertions: Exertion[];
     selectExertion: (id: string) => void;
     deleteExertion: (id: string) => void;
+    submitting: boolean;
 }
 
-export default function ExertionList({exertions, selectExertion, deleteExertion}: Props){
+export default function ExertionList({exertions, selectExertion, deleteExertion, submitting}: Props){
+    
+    const [target, setTarget] = useState('');
+    
+    function handleExertionDelete(e: SyntheticEvent<HTMLButtonElement>, id:string) {
+        setTarget(e.currentTarget.name);
+        deleteExertion(id);
+    }
+    
     return(
         <Segment>
             <Item.Group divided>
@@ -25,8 +35,15 @@ export default function ExertionList({exertions, selectExertion, deleteExertion}
                                 <Button onClick={() => {selectExertion(exertion.id)}} 
                                         floated='right' content='View' color='blue'/>
 
-                                <Button onClick={() => {deleteExertion(exertion.id)}}
-                                        floated='right' content='Delete' color='red'/>
+                                <Button onClick={(e) => 
+                                    handleExertionDelete(e, exertion.id)}
+                                    
+                                        name={exertion.id}
+                                        floated='right' 
+                                        content='Delete' 
+                                        color='red'
+                                        loading={submitting && target === exertion.id}        
+                                />
                                 <Label basic content={exertion.category}/>
                             </Item.Extra>
                         </Item.Content>
