@@ -5,10 +5,8 @@ namespace Socialooze
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.OpenApi.Models;
-    using Microsoft.EntityFrameworkCore;
     
-    using Persistence;    
+    using Extensions;
     public class Startup
     {
         private readonly IConfiguration _config;
@@ -22,27 +20,8 @@ namespace Socialooze
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "Socialooze", Version = "v1"});
-            });
+            services.AddApplicationServices(this._config);
 
-            services.AddDbContext<DataContext>(opt =>
-            {
-                opt.UseSqlServer(_config.GetConnectionString("DefaultConnection"));
-            });
-
-            services.AddCors(opt =>
-            {
-                opt.AddPolicy("CorsPolicy", policy =>
-                {
-                    policy
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .WithOrigins("http://localhost:3000");
-                });
-
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
