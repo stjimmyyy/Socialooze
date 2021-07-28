@@ -19,6 +19,17 @@ export default  class ExertionStore {
                 Date.parse(a.date) - Date.parse(b.date))
     }
     
+    get groupedExertions() {
+        return Object.entries(
+            this.exertionsByDate.reduce((exertions, exertion) => {
+                const date = exertion.date;
+                exertions[date] = exertions[date] ? [...exertions[date], exertion] :
+                    [exertion];
+                return exertions
+            }, {} as {[key: string]: Exertion[]})
+        )
+    }
+    
     loadExertions = async () => {
         this.loadingInitial = true;
         try {

@@ -4,6 +4,7 @@ import ExertionList from "./ExertionList";
 import {useStore} from "../../../app/stores/store";
 import {observer} from "mobx-react-lite";
 import LoadingComponent from "../../../app/layout/LoadingComponent";
+import ExertionFilters from "./ExertionFilters";
 
 export default observer( function ExertionDashboard(){
     const { exertionStore } = useStore();
@@ -21,7 +22,7 @@ export default observer( function ExertionDashboard(){
                 <ExertionList/>
             </Grid.Column>
             <Grid.Column width='6'>
-                <h2>Exertion filters</h2>
+                <ExertionFilters />
             </Grid.Column>
         </Grid>
     )
