@@ -1,15 +1,12 @@
 import React, {ChangeEvent, useState} from "react";
 import {Button, Form, Segment} from "semantic-ui-react";
-import {Exertion} from "../../../app/models/exertion";
+import {useStore} from "../../../app/stores/store";
+import {observer} from "mobx-react-lite";
 
-interface Props {
-    exertion: Exertion | undefined;
-    closeForm: () => void;
-    createOrEdit: (exertion: Exertion) => void;
-    submitting: boolean
-}
-
-export default function ExertionForm({exertion: selectedExertion, closeForm, createOrEdit, submitting}: Props){
+export default observer(function ExertionForm(){
+    
+    const { exertionStore } = useStore();
+    const { selectedExertion, closeForm, createExertion, updateExertion, loading } = exertionStore;
     
     const initialState = selectedExertion ?? {
         id: '',
@@ -24,7 +21,7 @@ export default function ExertionForm({exertion: selectedExertion, closeForm, cre
     const [exertion, setExertion] = useState(initialState);
     
     function handleSubmit() {
-        createOrEdit(exertion);
+        exertion.id ? updateExertion(exertion) : createExertion(exertion);
     }
     
     function handleInputChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>){
@@ -60,9 +57,9 @@ export default function ExertionForm({exertion: selectedExertion, closeForm, cre
                             name='venue'
                             onChange={handleInputChange}/>
                 
-                <Button loading={submitting} floated='right' positive type='submit' content='Submit'/>
+                <Button loading={loading} floated='right' positive type='submit' content='Submit'/>
                 <Button onClick={closeForm} floated='right' type='button' content='Cancel'/>
             </Form>
         </Segment>
     )
-}
+})

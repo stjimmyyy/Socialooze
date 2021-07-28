@@ -1,19 +1,16 @@
 import React, {SyntheticEvent} from "react";
-import {Exertion} from "../../../app/models/exertion";
 import {Button, Item, Label, Segment} from "semantic-ui-react";
 import { useState } from "react";
+import { useStore } from "../../../app/stores/store";
+import { observer } from "mobx-react-lite";
 
-interface Props {
-    exertions: Exertion[];
-    selectExertion: (id: string) => void;
-    deleteExertion: (id: string) => void;
-    submitting: boolean;
-}
 
-export default function ExertionList({exertions, selectExertion, deleteExertion, submitting}: Props){
-    
+export default observer (function ExertionList(){
+
+    const { exertionStore } = useStore();
     const [target, setTarget] = useState('');
-    
+    const {deleteExertion, exertionsByDate, loading} = exertionStore;
+
     function handleExertionDelete(e: SyntheticEvent<HTMLButtonElement>, id:string) {
         setTarget(e.currentTarget.name);
         deleteExertion(id);
@@ -22,7 +19,7 @@ export default function ExertionList({exertions, selectExertion, deleteExertion,
     return(
         <Segment>
             <Item.Group divided>
-                {exertions.map(exertion => (
+                {exertionsByDate.map(exertion => (
                     <Item key={exertion.id}>
                         <Item.Content>
                             <Item.Header as='a'>{exertion.title}</Item.Header>
@@ -32,7 +29,7 @@ export default function ExertionList({exertions, selectExertion, deleteExertion,
                                 <div>{exertion.city}, {exertion.venue}</div>
                             </Item.Description>
                             <Item.Extra>
-                                <Button onClick={() => {selectExertion(exertion.id)}} 
+                                <Button onClick={() => exertionStore.selectExertion(exertion.id)} 
                                         floated='right' content='View' color='blue'/>
 
                                 <Button onClick={(e) => 
@@ -42,7 +39,7 @@ export default function ExertionList({exertions, selectExertion, deleteExertion,
                                         floated='right' 
                                         content='Delete' 
                                         color='red'
-                                        loading={submitting && target === exertion.id}        
+                                        loading={loading && target === exertion.id}        
                                 />
                                 <Label basic content={exertion.category}/>
                             </Item.Extra>
@@ -52,4 +49,4 @@ export default function ExertionList({exertions, selectExertion, deleteExertion,
             </Item.Group>
         </Segment>
     )
-}
+})

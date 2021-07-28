@@ -1,14 +1,16 @@
 import React from "react";
 import {Button, Card, Image} from "semantic-ui-react";
-import {Exertion} from "../../../app/models/exertion";
+import {useStore} from "../../../app/stores/store";
+import LoadingComponent from "../../../app/layout/LoadingComponent";
 
-interface Props {
-    exertion: Exertion;
-    cancelSelectExertion: () => void;
-    openForm: (id: string) => void;
-}
 
-export default function ExertionDetails({exertion, cancelSelectExertion, openForm}: Props) {
+export default function ExertionDetails() {
+    
+    const { exertionStore } = useStore();
+    const {selectedExertion: exertion, openForm, cancelSelectedExertion } = exertionStore
+    
+    if(!exertion) return <LoadingComponent />;
+    
     return (
         <Card fluid>
             <Image src={`/assets/categoryImages/${exertion.category}.jpg`}/>
@@ -24,7 +26,7 @@ export default function ExertionDetails({exertion, cancelSelectExertion, openFor
             <Card.Content extra>
                 <Button.Group widths='2'>
                     <Button onClick={() => openForm(exertion.id)} basic color='blue' content='Edit'/>
-                    <Button onClick={cancelSelectExertion} basic color='grey' content='Cancel'/>
+                    <Button onClick={cancelSelectedExertion} basic color='grey' content='Cancel'/>
                 </Button.Group>
             </Card.Content>
         </Card>
