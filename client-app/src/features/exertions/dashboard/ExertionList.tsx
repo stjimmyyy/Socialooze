@@ -3,6 +3,7 @@ import {Button, Item, Label, Segment} from "semantic-ui-react";
 import { useState } from "react";
 import { useStore } from "../../../app/stores/store";
 import { observer } from "mobx-react-lite";
+import {Link} from "react-router-dom";
 
 
 export default observer (function ExertionList(){
@@ -29,8 +30,7 @@ export default observer (function ExertionList(){
                                 <div>{exertion.city}, {exertion.venue}</div>
                             </Item.Description>
                             <Item.Extra>
-                                <Button onClick={() => exertionStore.selectExertion(exertion.id)} 
-                                        floated='right' content='View' color='blue'/>
+                                <Button as={Link} to={`/exertions/${exertion.id}`} floated='right' content='View' color='blue'/>
 
                                 <Button onClick={(e) => 
                                     handleExertionDelete(e, exertion.id)}

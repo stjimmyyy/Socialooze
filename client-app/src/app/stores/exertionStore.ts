@@ -1,7 +1,6 @@
 import {makeAutoObservable, runInAction} from "mobx";
 import {Exertion} from "../models/exertion";
 import agent from "../api/agent";
-import {v4 as uuid} from 'uuid';
 
 export default  class ExertionStore {
     exertionRegistry = new Map<string, Exertion>();
@@ -21,12 +20,12 @@ export default  class ExertionStore {
     }
     
     loadExertions = async () => {
+        this.loadingInitial = true;
         try {
             const exertions = await agent.Exertions.list();
 
             exertions.forEach(exertion => {
-                exertion.date = exertion.date.split('T')[0];
-                this.exertionRegistry.set(exertion.id, exertion)
+                this.setExertion(exertion);
             })
             
             this.setLoadingInitial(false);
@@ -37,31 +36,43 @@ export default  class ExertionStore {
         }
     }
     
+    loadExertion = async (id: string) => {
+        let exertion = this.getExertion(id);
+        if(exertion){
+            this.selectedExertion = exertion;
+            return exertion;
+        } else {
+            this.loadingInitial = true;
+            try {
+                exertion = await agent.Exertions.details(id);
+                this.setExertion(exertion);
+                runInAction(() => {
+                    this.selectedExertion = exertion;
+                    this.setLoadingInitial(false);            
+                })
+                return exertion;
+            } catch (error){
+                console.log(error);
+                this.setLoadingInitial(false)
+            }
+        }
+    }
+    
+    private setExertion = (exertion: Exertion) => {
+        exertion.date = exertion.date.split('T')[0];
+        this.exertionRegistry.set(exertion.id, exertion);
+    }
+    
+    private getExertion = (id: string) => {
+        return this.exertionRegistry.get(id);
+    }
+    
     setLoadingInitial = (state: boolean) => {
         this.loadingInitial = state;
     }
     
-    selectExertion = (id: string) => {
-        this.selectedExertion = this.exertionRegistry.get(id);
-    }
-    
-    cancelSelectedExertion = () => {
-        this.selectedExertion = undefined;
-    }
-    
-    openForm = (id?: string) => {
-        id ? this.selectExertion(id) : this.cancelSelectedExertion();
-        this.editMode = true;
-    }
-    
-    closeForm = () => {
-        this.editMode = false;
-    }
-    
     createExertion = async (exertion: Exertion) => {
         this.loading = true;
-        exertion.id = uuid();
-        
         try{
             await agent.Exertions.create(exertion);
             runInAction(() => {
@@ -104,7 +115,6 @@ export default  class ExertionStore {
             await agent.Exertions.delete(id);
             runInAction(() => {
                 this.exertionRegistry.delete(id);
-                if(this.selectedExertion?.id === id) this.cancelSelectedExertion();
                 this.loading = false;
             })
         } catch (error) {
