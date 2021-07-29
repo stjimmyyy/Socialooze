@@ -2,6 +2,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react'
 import {Segment, Grid, Icon} from 'semantic-ui-react'
 import {Exertion} from "../../../app/models/exertion";
+import {format} from "date-fns";
 
 interface Props {
     exertion: Exertion
@@ -27,7 +28,7 @@ export default observer(function ActivityDetailedInfo({exertion}: Props) {
                     </Grid.Column>
                     <Grid.Column width={15}>
             <span>
-              {exertion.date}
+              {format(exertion.date!, 'dd MMM yyyy h:mm aa')}
             </span>
                     </Grid.Column>
                 </Grid>

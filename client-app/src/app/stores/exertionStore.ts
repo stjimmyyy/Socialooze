@@ -1,13 +1,14 @@
 import {makeAutoObservable, runInAction} from "mobx";
 import {Exertion} from "../models/exertion";
 import agent from "../api/agent";
+import {format} from "date-fns";
 
 export default  class ExertionStore {
     exertionRegistry = new Map<string, Exertion>();
     selectedExertion: Exertion | undefined = undefined;
     editMode = false;
     loading = false;
-    loadingInitial = true;
+    loadingInitial = false;
     
     constructor() {
         makeAutoObservable(this)
@@ -16,13 +17,13 @@ export default  class ExertionStore {
     get exertionsByDate() {
         return Array.from(this.exertionRegistry.values())
             .sort((a, b) => 
-                Date.parse(a.date) - Date.parse(b.date))
+                a.date!.getTime() - b.date!.getTime());
     }
     
     get groupedExertions() {
         return Object.entries(
             this.exertionsByDate.reduce((exertions, exertion) => {
-                const date = exertion.date;
+                const date = format(exertion.date!, 'dd MMM yyyy')
                 exertions[date] = exertions[date] ? [...exertions[date], exertion] :
                     [exertion];
                 return exertions
@@ -70,7 +71,7 @@ export default  class ExertionStore {
     }
     
     private setExertion = (exertion: Exertion) => {
-        exertion.date = exertion.date.split('T')[0];
+        exertion.date = new Date(exertion.date!);
         this.exertionRegistry.set(exertion.id, exertion);
     }
     

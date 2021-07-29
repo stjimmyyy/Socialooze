@@ -1,23 +1,34 @@
+using Application.Core;
 
 namespace Application.Exertions
 {
-    using AutoMapper;
-
     using System.Threading;
     using System.Threading.Tasks;
     
     using MediatR;
+    using AutoMapper;
+    using FluentValidation;
+    
     using Persistence; 
     using Domain;
 
     public class Edit
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result<Unit>>
         {
             public Exertion Exertion { get; set; }
         }
         
-        public class Handler : IRequestHandler<Command>
+        public class CommandValidator : AbstractValidator<Command>
+        {
+            public CommandValidator()
+            {
+                RuleFor(x => x.Exertion)
+                    .SetValidator(new ExertionValidator());
+            }
+        }
+        
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
@@ -28,15 +39,19 @@ namespace Application.Exertions
                 this._mapper = mapper;
             }
 
-            public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var exertion = await this._context.Exertions.FindAsync(request.Exertion.Id);
 
+                if (exertion == null) return null;
+                
                 this._mapper.Map(request.Exertion, exertion);
 
-                await this._context.SaveChangesAsync(cancellationToken);
+                var result = await this._context.SaveChangesAsync(cancellationToken) > 0;
+
+                if (!result) return Result<Unit>.Failure("Failed to update exertion");
                 
-                return Unit.Value;
+                return Result<Unit>.Success(Unit.Value);
             }
         }
     }

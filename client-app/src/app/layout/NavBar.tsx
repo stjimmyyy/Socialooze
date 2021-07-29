@@ -13,6 +13,7 @@ export default function NavBar(){
                     Socialooze
                 </Menu.Item>
                 <Menu.Item as={NavLink} to='/exertions' name ='Exertions'/>
+                <Menu.Item as={NavLink} to='errors' name='errors'/>
                 <Menu.Item>
                     <Button as={NavLink} to='/createExertion' positive content='Create Exertion' />
                 </Menu.Item>

@@ -2,6 +2,7 @@ import React from "react";
 import {Button, Icon, Item, Segment} from "semantic-ui-react";
 import {Link} from "react-router-dom";
 import {Exertion} from "../../../app/models/exertion";
+import { format } from 'date-fns';
 
 interface Props {
     exertion: Exertion
@@ -26,7 +27,7 @@ export default function ExertionListItem({exertion}: Props){
             </Segment>
             <Segment>
                 <span>
-                    <Icon name='clock' /> {exertion.date}
+                    <Icon name='clock' /> {format(exertion.date!, 'dd MMM yyyy h:mm aa')}
                     <Icon name='marker'/> {exertion.venue}
                 </span>
             </Segment>

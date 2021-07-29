@@ -4,7 +4,7 @@ import { useStore } from "../../app/stores/store";
 import {Header, Segment} from "semantic-ui-react";
 import {observer} from "mobx-react-lite";
 
-export default observer( function ServerError(){
+export default observer(function ServerError(){
     const {commonStore} = useStore();
     
     return(
