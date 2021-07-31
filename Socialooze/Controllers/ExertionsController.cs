@@ -9,7 +9,7 @@ namespace Socialooze.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization; 
     
-    
+    [AllowAnonymous]
     public class ExertionsController : BaseApiController
     {
         [HttpGet]

@@ -14,7 +14,7 @@ export default observer( function ExertionDashboard(){
         if (exertionRegistry.size <= 1) loadExertions()
     }, [exertionRegistry.size, loadExertions])
 
-    if(exertionStore.loadingInitial) return <LoadingComponent content='Loading app...' />
+    if(exertionStore.loadingInitial) return <LoadingComponent content='Loading exertions...' />
     
     return(
         <Grid>
