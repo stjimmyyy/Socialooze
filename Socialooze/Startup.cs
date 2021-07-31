@@ -1,13 +1,13 @@
 namespace Socialooze
 {
-    
-    
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc.Authorization;
+    
     using Application.Exertions;
     using FluentValidation.AspNetCore;
     
@@ -25,13 +25,21 @@ namespace Socialooze
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
-                    .AddFluentValidation(config =>
-                    {
-                        config.RegisterValidatorsFromAssemblyContaining<Create>();
-                    });
+            services.AddControllers(opt =>
+                {
+                    var policy = new AuthorizationPolicyBuilder()
+                        .RequireAuthenticatedUser()
+                        .Build();
+                    opt.Filters.Add(new AuthorizeFilter(policy));
+
+                })
+                .AddFluentValidation(config => 
+                {
+                    config.RegisterValidatorsFromAssemblyContaining<Create>();
+                });
             
             services.AddApplicationServices(this._config);
+            services.AddIdentityServices(this._config);
 
         }
 
@@ -48,17 +56,14 @@ namespace Socialooze
 
             //app.UseHttpsRedirection();
 
-            app.UseRouting();
-
-            app.UseCors("CorsPolicy");
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseRouting()
+                .UseCors("CorsPolicy")
+                .UseAuthentication()
+                .UseAuthorization()
+                .UseEndpoints(endpoints =>
+                {
+                    endpoints.MapControllers();
+                });
         }
     }
 }

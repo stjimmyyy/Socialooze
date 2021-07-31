@@ -1,5 +1,6 @@
 namespace Socialooze
 {
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,8 @@ namespace Socialooze
     using System;
     using System.Threading.Tasks;
     
+    
+    using Domain;
     using Persistence;
     
     
@@ -27,9 +30,9 @@ namespace Socialooze
             try
             {
                 var context = services.GetRequiredService<DataContext>();
-                
+                var userManager = services.GetRequiredService<UserManager<AppUser>>();
                 await context.Database.MigrateAsync();
-                await Seeder.SeedData(context);
+                await Seeder.SeedData(context, userManager);
 
             }
             catch (Exception e)

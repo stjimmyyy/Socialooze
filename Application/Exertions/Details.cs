@@ -1,12 +1,10 @@
-using Application.Core;
-
 namespace Application.Exertions
 {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
     
-    
+    using Core;
     using Persistence;
     using Domain;
     using MediatR;
